@@ -73,7 +73,7 @@ export default function SignupPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4 bg-muted/30">
-      <Card className="w-full max-w-md border-muted-foreground/10 shadow-lg">
+      <Card className="w-full max-w-md lg:max-w-lg border-muted-foreground/10 shadow-lg">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold tracking-tight">
             Create an account
@@ -118,6 +118,7 @@ export default function SignupPage() {
               <Input
                 id="password"
                 type="password"
+                autoComplete="new-password"
                 disabled={isLoading}
                 {...register("password")}
               />
@@ -132,6 +133,7 @@ export default function SignupPage() {
               <Input
                 id="confirmPassword"
                 type="password"
+                autoComplete="new-password"
                 disabled={isLoading}
                 {...register("confirmPassword")}
               />
