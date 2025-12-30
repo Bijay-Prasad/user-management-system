@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { authApi } from "./authApi";
 
 interface User {
   id: string;
@@ -14,11 +15,8 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  token: typeof window !== "undefined" ? localStorage.getItem("token") : null,
-  user:
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("user") || "null")
-      : null,
+  token: null,
+  user: null,
   isAuthenticated: false,
 };
 
@@ -26,29 +24,46 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    loginSuccess(state, action: PayloadAction<{ token: string; user: User }>) {
-      state.token = action.payload.token;
+    setCredentials(
+      state,
+      action: PayloadAction<{ user: User; token: string }>
+    ) {
       state.user = action.payload.user;
+      state.token = action.payload.token;
       state.isAuthenticated = true;
-
-      localStorage.setItem("token", action.payload.token);
-      localStorage.setItem("user", JSON.stringify(action.payload.user));
     },
     logout(state) {
-      state.token = null;
       state.user = null;
+      state.token = null;
       state.isAuthenticated = false;
-
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      // Clear persistence handled by persist/PURGE if needed, or allow persistor.purge() call in component
     },
-    restoreAuth(state) {
-      if (state.token && state.user) {
-        state.isAuthenticated = true;
-      }
-    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addMatcher(
+        authApi.endpoints.login.matchFulfilled,
+        (state, { payload }) => {
+          state.token = payload.token;
+          state.user = payload.user;
+          state.isAuthenticated = true;
+        }
+      )
+      .addMatcher(
+        authApi.endpoints.signup.matchFulfilled,
+        (state, { payload }) => {
+          state.token = payload.token;
+          state.user = payload.user;
+          state.isAuthenticated = true;
+        }
+      )
+      .addMatcher(authApi.endpoints.logout.matchFulfilled, (state) => {
+        state.token = null;
+        state.user = null;
+        state.isAuthenticated = false;
+      });
   },
 });
 
-export const { loginSuccess, logout, restoreAuth } = authSlice.actions;
+export const { setCredentials, logout } = authSlice.actions;
 export default authSlice.reducer;

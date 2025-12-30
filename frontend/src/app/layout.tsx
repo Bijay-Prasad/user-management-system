@@ -1,20 +1,29 @@
-import "./globals.css";
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { Providers } from "./providers";
+import "./globals.css";
+import { ReduxProvider } from "@/store/provider";
 import { Toaster } from "@/components/ui/sonner";
+import { LayoutWrapper } from "@/components/layout-wrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const metadata: Metadata = {
+  title: "User Management System",
+  description: "Modern Full-Stack User Management",
+};
+
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>{children}</Providers>
-        <Toaster richColors position="top-right" />
+        <ReduxProvider>
+          <LayoutWrapper>{children}</LayoutWrapper>
+          <Toaster />
+        </ReduxProvider>
       </body>
     </html>
   );

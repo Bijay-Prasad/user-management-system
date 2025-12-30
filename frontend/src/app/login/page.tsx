@@ -1,64 +1,131 @@
 "use client";
 
 import { useState } from "react";
-import { api } from "./../../lib/api";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+
+import { useLoginMutation } from "@/store/authApi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
-import { BlurFade } from "./../../components/ui/blur-fade";
-import { toast } from "sonner";
-import { loginSuccess } from "@/store/authSlice";
-import { useDispatch } from "react-redux";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const dispatch = useDispatch();
   const router = useRouter();
+  const [login, { isLoading }] = useLoginMutation();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const submit = async () => {
+  const onSubmit = async (data: LoginFormValues) => {
     try {
-      const res = await api.post("/api/auth/login", { email, password });
-
-      dispatch(
-        loginSuccess({
-          token: res.data.token,
-          user: res.data.user,
-        })
-      );
-
-      toast.success("Login successful");
+      await login(data).unwrap();
+      toast.success("Welcome back!", {
+        description: "You have successfully logged in.",
+      });
       router.push("/dashboard");
     } catch (err: any) {
-      toast.error(err.response?.data?.message);
+      const errorMessage =
+        err?.data?.message || "Invalid email or password. Please try again.";
+      toast.error("Login failed", {
+        description: errorMessage,
+      });
     }
   };
 
   return (
-    <BlurFade>
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-[380px]">
-          <CardHeader className="text-center text-xl font-bold">
-            Login
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Input
-              placeholder="Email"
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <Input
-              type="password"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Button className="w-full" onClick={submit}>
-              Login
+    <div className="flex min-h-screen items-center justify-center p-4 bg-muted/30">
+      <Card className="w-full max-w-md border-muted-foreground/10 shadow-lg">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold tracking-tight">
+            Sign in
+          </CardTitle>
+          <CardDescription>
+            Enter your email and password to access your account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                placeholder="name@example.com"
+                type="email"
+                autoCapitalize="none"
+                autoComplete="email"
+                autoCorrect="off"
+                disabled={isLoading}
+                {...register("email")}
+              />
+              {errors.email && (
+                <p className="text-sm text-destructive font-medium">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  href="#"
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                disabled={isLoading}
+                {...register("password")}
+              />
+              {errors.password && (
+                <p className="text-sm text-destructive font-medium">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+            <Button className="w-full" type="submit" loading={isLoading}>
+              {isLoading ? "Signing in..." : "Sign In"}
             </Button>
-          </CardContent>
-        </Card>
-      </div>
-    </BlurFade>
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col gap-2">
+          <div className="text-sm text-muted-foreground text-center">
+            Don't have an account?{" "}
+            <Link
+              href="/signup"
+              className="font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Sign up
+            </Link>
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }

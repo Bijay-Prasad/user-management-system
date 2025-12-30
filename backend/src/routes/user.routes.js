@@ -6,7 +6,7 @@ const { validateProfileUpdate, validatePasswordChange } = require("../middleware
 
 router.get("/", auth, role("admin"), user.getAllUsers);
 router.patch("/:id/status", auth, role("admin"), user.toggleStatus);
-router.put("/me", auth, validateProfileUpdate, user.updateProfile);
+router.put("/me", auth, user.updateProfile);
 router.put("/me/password", auth, validatePasswordChange, user.changePassword);
 
 module.exports = router;
