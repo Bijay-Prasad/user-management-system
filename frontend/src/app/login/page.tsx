@@ -8,21 +8,33 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { BlurFade } from "./../../components/ui/blur-fade";
 import { toast } from "sonner";
+import { loginSuccess } from "@/store/authSlice";
+import { useDispatch } from "react-redux";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const dispatch = useDispatch();
+  const router = useRouter();
+
   const submit = async () => {
-  try {
-    await api.post("/api/auth/login", { email, password });
-    toast.success("Login successful");
-    router.push("/dashboard");
-  } catch (err: any) {
-    toast.error(err.response?.data?.message || "Login failed");
-  }
-};
+    try {
+      const res = await api.post("/api/auth/login", { email, password });
+
+      dispatch(
+        loginSuccess({
+          token: res.data.token,
+          user: res.data.user,
+        })
+      );
+
+      toast.success("Login successful");
+      router.push("/dashboard");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message);
+    }
+  };
 
   return (
     <BlurFade>

@@ -1,7 +1,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
+import { Providers } from "./providers";
 import { Toaster } from "@/components/ui/sonner";
-import { PageTransition } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,7 +13,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <PageTransition>{children}</PageTransition>
+        <Providers>{children}</Providers>
         <Toaster richColors position="top-right" />
       </body>
     </html>
