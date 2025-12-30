@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +33,7 @@ export function Navbar() {
   const [logoutApi] = useLogoutMutation();
   const dispatch = useDispatch();
   const pathname = usePathname();
+  const router = useRouter();
 
   const handleLogout = async () => {
     try {
@@ -41,6 +42,8 @@ export function Navbar() {
       console.error("Logout failed", e);
     } finally {
       dispatch(logout());
+      router.push("/");
+      router.refresh();
     }
   };
 

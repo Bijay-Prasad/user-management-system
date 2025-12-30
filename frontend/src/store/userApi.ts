@@ -18,7 +18,7 @@ export const userApi = createApi({
   tagTypes: ["User"],
   endpoints: (builder) => ({
     getProfile: builder.query({
-      query: () => "/users/me",
+      query: () => "/auth/me",
       providesTags: ["User"],
     }),
     updateProfile: builder.mutation({
@@ -28,6 +28,21 @@ export const userApi = createApi({
         body: userData,
       }),
       invalidatesTags: ["User"],
+      async onQueryStarted(userData, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          // Dynamically import setUser to avoid circular dependency issues if any,
+          // usually fine if store imports API but API shouldn't import slice reducer index directly if recursive.
+          // However, we can dispatch the action type string or import just the action creator if safe.
+          // Safety: We import { setUser } from authSlice.
+          // Assuming authSlice is already loaded.
+          // If circular dependency occurs, we might need to move slice actions or types.
+          // But here, let's try importing at top level. If runtime error, we fix.
+          dispatch(require("./authSlice").setUser(data.user));
+        } catch (err) {
+           // update failed
+        }
+      },
     }),
     changePassword: builder.mutation({
       query: (passwordData) => ({
