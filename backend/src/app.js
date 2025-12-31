@@ -6,8 +6,13 @@ const { errorHandler } = require("./middleware/errorHandler");
 const app = express();
 
 // CORS configuration
+const allowedOrigins = [
+    "http://localhost:3000",
+    process.env.FRONTEND_URL // Production URL from env
+].filter(Boolean);
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: allowedOrigins,
     credentials: true
 }));
 
