@@ -4,6 +4,7 @@ import "./globals.css";
 import { ReduxProvider } from "@/store/provider";
 import { Toaster } from "@/components/ui/sonner";
 import { LayoutWrapper } from "@/components/layout-wrapper";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,8 +22,15 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ReduxProvider>
-          <LayoutWrapper>{children}</LayoutWrapper>
-          <Toaster />
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <LayoutWrapper>{children}</LayoutWrapper>
+            <Toaster />
+          </ThemeProvider>
         </ReduxProvider>
       </body>
     </html>

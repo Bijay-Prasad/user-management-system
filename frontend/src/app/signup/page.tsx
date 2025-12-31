@@ -72,7 +72,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-muted/30">
+    <div className="flex min-h-screen min-w-screen items-center justify-center p-4 bg-muted/30">
       <Card className="w-full max-w-md lg:max-w-lg border-muted-foreground/10 shadow-lg">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold tracking-tight">

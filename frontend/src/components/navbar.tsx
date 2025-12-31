@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useLogoutMutation } from "@/store/authApi";
 import { logout } from "@/store/authSlice";
 import { LayoutDashboard, LogOut, User } from "lucide-react";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
 interface RootState {
   auth: {
@@ -42,8 +43,8 @@ export function Navbar() {
       console.error("Logout failed", e);
     } finally {
       dispatch(logout());
-      router.push("/");
-      router.refresh();
+      // Force hard redirect to home to prevent AuthGuard race conditions
+      window.location.href = "/";
     }
   };
 
@@ -60,6 +61,7 @@ export function Navbar() {
         </Link>
 
         <div className="flex items-center gap-4">
+          <AnimatedThemeToggler className="mr-2" />
           {isAuthenticated ? (
             <div className="flex items-center gap-4">
               {user?.role === 'admin' && (
