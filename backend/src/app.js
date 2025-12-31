@@ -8,7 +8,8 @@ const app = express();
 // CORS configuration
 const allowedOrigins = [
     "http://localhost:3000",
-    process.env.FRONTEND_URL // Production URL from env
+    process.env.FRONTEND_URL, // Production URL from env
+    /\.vercel\.app$/ // Allow any Vercel deployment (previews & production)
 ].filter(Boolean);
 
 app.use(cors({
